@@ -20,6 +20,7 @@ def parse_args():
 
     args = parser.parse_args()
 
+
     return args
 
 def get_hmm():
@@ -40,6 +41,8 @@ def main():
             datefmt='%Y-%m-%d %H:%M:%S')
     else:
         logfile = sys.stdout
+
+    print "Hello!"
 
     logging.info('Start.')
     logging.info('Command line: {}'.format(' '.join(sys.argv)))
