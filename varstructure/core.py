@@ -8,6 +8,7 @@ import logging
 import os
 import string
 import sys
+import vcf
 
 def parse_args():
     parser = ArgumentParser()
