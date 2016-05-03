@@ -12,7 +12,7 @@ import vcf
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("--version", action='version', version='%(prog)s ' + pedtools_version)
+    parser.add_argument("--version", action='version', version='%(prog)s ' + varstructure_version)
     parser.add_argument("--vcf", type=str, dest="vcf", help="Input variant file (vcf)", required=True)
     parser.add_argument("--output", type=str, dest="out", help="Output file (tabular)", required=True)
     parser.add_argument("--log", type=str, help="Logs progress in specified file, defaults to stdout.")

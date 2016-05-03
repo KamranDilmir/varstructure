@@ -4,4 +4,4 @@
 
 import pkg_resources  # part of setuptools
 
-pedtools_version = pkg_resources.require("varstructure")[0].version
+varstructure_version = pkg_resources.require("varstructure")[0].version
