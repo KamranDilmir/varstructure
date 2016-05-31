@@ -1,6 +1,6 @@
 # varstructure
 
-Khalid Mahmood
+Muhammad Kamran Dilmir
 
 
 local installation
