@@ -2,7 +2,7 @@
 
 from string import whitespace
 from argparse import ArgumentParser
-from version import pedtools_version
+from version import varstructure_version
 from string import whitespace
 import logging
 import os
@@ -19,8 +19,8 @@ def parse_args():
     parser.add_argument("-v", "--verbosity", action="count", default=0)
 
     args = parser.parse_args()
-    
-    
+
+
     if args.verbosity >= 2:
         print "{} to the power {} equals {}".format(args.v, args.o, answer)
     elif args.verbosity >= 1:
@@ -60,7 +60,7 @@ def main():
         current_pos = record.POS
         current_ref = record.REF
         current_alt = ','.join(str(v) for v in record.ALT)
-        
+
         # VEP fields
         current_gene, current_feature = '',''
         current_feature_type, current_consequence = '',''
@@ -91,7 +91,7 @@ def main():
             outputfile.write("\n")
 
     outputfile.close()
-   
+
    # print "Hello!"
 
     logging.info('Start.')
