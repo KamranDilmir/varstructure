@@ -14,9 +14,9 @@ setup(
     version='0.0.1',
     description='varstructure package',
     long_description=readme,
-    author='Khalid Mahmood',
-    author_email='khalid.mahmood@unimelb.edu.au',
-    url='https://github.com/khalidm/varstructure',
+    author='Kamran Dilmir',
+    author_email='m.dilmir@unimelb.edu.au',
+    url='https://github.com/KamranDilmir/varstructure',
     license=license,
     entry_points={
         'console_scripts': ['varstructure = varstructure.core:main']
