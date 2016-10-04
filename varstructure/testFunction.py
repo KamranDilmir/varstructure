@@ -92,7 +92,8 @@ def main():
                             if bool(mapping_Dictionary) == True :
                                 if curr_ENSP not in ENSP_PDB_UNIPROT_mapping_DataFram.index:
                                     ENSP_PDB_UNIPROT_mapping_DataFram.loc[curr_ENSP] = pd.Series({'ENSP':curr_ENSP, 'UniProtID':mapping_Dictionary.keys(), 'PDB':mapping_Dictionary.values()})
-    print(ENSP_PDB_UNIPROT_mapping_DataFram)
+
+    #print(ENSP_PDB_UNIPROT_mapping_DataFram)
     # writing in a csv file
     for record in vcf_reader:
         current_chr = record.CHROM
@@ -118,8 +119,10 @@ def main():
                 current_feature = current_csq[6]
                 current_protein_position = current_csq[14]
                 current_amino_acid = current_csq[15]
-                current_ENSP = current_csq[27]
-                current_swissport = current_csq[28]
+                current_ENSP = current_csq[26]
+                current_swissport = current_csq[27]
+
+                # only cosider missense mutation
 
                 #if current_swissport_in_my_list(current_swissport, swissprot_pdb_)
                 if current_ENSP in ENSP_PDB_UNIPROT_mapping_DataFram.index:
