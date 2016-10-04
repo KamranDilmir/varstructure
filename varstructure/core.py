@@ -122,6 +122,8 @@ def main():
                 current_ENSP = current_csq[26]
                 current_swissport = current_csq[27]
 
+                # only cosider missense mutation
+
                 #if current_swissport_in_my_list(current_swissport, swissprot_pdb_)
                 if current_ENSP in ENSP_PDB_UNIPROT_mapping_DataFram.index:
                     current_protein = ENSP_PDB_UNIPROT_mapping_DataFram.loc[current_ENSP]['UniProtID']
