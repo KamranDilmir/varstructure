@@ -21,8 +21,10 @@ from collections import defaultdict
 from collections import OrderedDict
 import itertools
 import pandas as pd
+import sqlite3
 
 from Bio import SwissProt
+from flask import Flask, render_template
 
 def parse_args():
     parser = ArgumentParser()
@@ -62,38 +64,13 @@ def main():
 
     outputfile = open(args.out, "w")
     # Output header
-    outputfile.write("chr\tpos\tid\tref\talt\tgene\tfeature\tfeature_type\tconsequence\tswissprotid\tuniprotid\tpdbid\tprotein_position\tamino_acid\n")
+    outputfile.write("chr\tpos\tid\tref\talt\tgene\tfeature\tfeature_type\tconsequence\tswissprotid\tcurrent_ENSP\tuniprotid\tpdbid\tprotein_position\tamino_acid\n")
 
     vcf_row = {}
 
     #Interface to the UniProt service
     u = UniProt(verbose=False)
-
     vcf_reader = vcf.Reader(open(args.vcf, 'r'))
-    ENSP_PDB_UNIPROT_mapping_DataFram = pd.DataFrame(columns=['ENSP','UniProtID','PDB'])
-    #creating a util function to store mapping of Uniprot and PDB_ID
-    for record in vcf_reader:
-        # VEP fields
-        curr_ENSP = ''
-        if "CSQ" in record.INFO:
-            csq = record.INFO['CSQ']
-            # BELOW: THERE ARE A COUPLE OF OPTIONS TO PROCEED
-            # For going through annotations for all transcript
-            for current_csq_element in csq:
-                current_csq = current_csq_element.split('|')
-                curr_ENSP = str(current_csq[26])
-                if curr_ENSP != "":
-                    # to get Protein ID given ENSP ID
-                    current_protein_list = u.search(curr_ENSP,frmt="list")
-                    for curr_protein in current_protein_list.split("\n"):
-                        if curr_protein != "":
-                            # to get PDB ID given protein id
-                            mapping_Dictionary = u.mapping(fr="ID", to="PDB_ID", query=str(curr_protein))
-                            if bool(mapping_Dictionary) == True :
-                                if curr_ENSP not in ENSP_PDB_UNIPROT_mapping_DataFram.index:
-                                    ENSP_PDB_UNIPROT_mapping_DataFram.loc[curr_ENSP] = pd.Series({'ENSP':curr_ENSP, 'UniProtID':mapping_Dictionary.keys(), 'PDB':mapping_Dictionary.values()})
-
-    #print(ENSP_PDB_UNIPROT_mapping_DataFram)
     # writing in a csv file
     for record in vcf_reader:
         current_chr = record.CHROM
@@ -105,10 +82,9 @@ def main():
         # VEP fields
         current_gene, current_feature = '',''
         current_feature_type, current_consequence = '',''
-        current_swissport,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid = '','','','','',''
+        current_swissprot,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid = '','','','','',''
         if "CSQ" in record.INFO:
             csq = record.INFO['CSQ']
-
             # BELOW: THERE ARE A COUPLE OF OPTIONS TO PROCEED
             # For going through annotations for all transcript
             for current_csq_element in csq:
@@ -120,46 +96,58 @@ def main():
                 current_protein_position = current_csq[14]
                 current_amino_acid = current_csq[15]
                 current_ENSP = current_csq[26]
-                current_swissport = current_csq[27]
-
+                current_swissprot = current_csq[27]
                 # only cosider missense mutation
+                con = sqlite3.connect("PDB_Chain_Uniprot.db")
+                cur = con.cursor()
+                #print(current_swissprot)
 
-                #if current_swissport_in_my_list(current_swissport, swissprot_pdb_)
-                if current_ENSP in ENSP_PDB_UNIPROT_mapping_DataFram.index:
-                    current_protein = ENSP_PDB_UNIPROT_mapping_DataFram.loc[current_ENSP]['UniProtID']
-                    for item in ENSP_PDB_UNIPROT_mapping_DataFram.loc[current_ENSP]['PDB']:
-                        current_pdbid = item
+                if current_swissprot != "":
+                    cur.execute("SELECT PDB,SP_PRIMARY FROM PDB_Chain_Uniprot WHERE Swissprot_Id =?",(str(current_swissprot),))
+                    rows = cur.fetchall()
+                    #print(rows)
+                    for row in rows:
+                        #print(row)
+                        current_pdbid = row[0]
+                        #print(row[0])
+                        current_protein = row[1]
+                        #print(row[1])
+                        #print(current_pdbid)
+                        #print(current_protein)
                         break;
-                    out_str = [ current_chr, str(current_pos), str(current_id), current_ref, current_alt,
-                                current_gene, current_feature, current_feature_type, current_consequence,current_swissport,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid]
+                            #out_str = [ current_chr, str(current_pos), str(current_id), current_ref, current_alt,current_gene, current_feature, current_feature_type, current_consequence,current_swissport,current_ENSP, current_protein, str(current_pdbid) , current_protein_position, current_amino_acid]
                 else:
                     current_protein = ""
                     current_pdbid = ""
-                    out_str = [ current_chr, str(current_pos), str(current_id), current_ref, current_alt,
-                            current_gene, current_feature, current_feature_type, current_consequence,current_swissport,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid]
 
+                out_str = [ current_chr, str(current_pos), str(current_id), current_ref, current_alt,current_gene, current_feature, current_feature_type, current_consequence,current_swissprot,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid]
                 out_str = [x or 'None' for x in out_str]
-
                 outputfile.write("\t".join(out_str))
                 outputfile.write("\n")
-
+                con.commit()
+                con.close()
         else:
             current_gene, current_feature = '',''
             current_feature_type, current_consequence = '',''
-            current_swissport,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid = '','','','','',''
+            current_swissprot,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid = '','','','','',''
 
             out_str = [ current_chr, str(current_pos), str(current_id), current_ref, current_alt,
-                        current_gene, current_feature, current_feature_type, current_consequence,current_swissport,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid]
+                        current_gene, current_feature, current_feature_type, current_consequence,current_swissprot,current_ENSP, current_protein, current_pdbid , current_protein_position, current_amino_acid]
             out_str = [x or 'None' for x in out_str]
             outputfile.write("\t".join(out_str))
             outputfile.write("\n")
 
     outputfile.close()
-
     logging.info('Start.')
     logging.info('Command line: {}'.format(' '.join(sys.argv)))
+
+app = Flask(__name__)
+@app.route("/")
+def main():
+    return render_template('index0.html')
 
     # logging.info()
 
 if __name__ == '__main__':
     main()
+    app.run()
