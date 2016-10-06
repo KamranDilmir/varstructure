@@ -50,6 +50,8 @@ def get_hmm():
 def hmm():
     """Contemplation..."""
     print get_hmm()
+    
+app = Flask(__name__)
 
 def main():
     """ Main function."""
@@ -141,9 +143,9 @@ def main():
     logging.info('Start.')
     logging.info('Command line: {}'.format(' '.join(sys.argv)))
 
-app = Flask(__name__)
+
 @app.route("/")
-def main():
+def flskmain():
     return render_template('index0.html')
 
     # logging.info()
