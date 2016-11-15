@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Result</title>
+
+    <!-- Bootstrap -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.2.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.2.0/css/select.dataTables.min.css">
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <!--<script type="text/javascript" src="{{ url_for('static', filename='pv.min.js') }}">!-->
+    <script type='text/javascript' src='/static/pv.min.js'></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+
+    <style>
+    body {
+      padding-top: 50px;
+    }
+    </style>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Main</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+      <div>
+        <h1>Results</h1>
+        <table id="table_result" class="display">
+          <thead>
+            <tr>
+              <th>Chrom</th>
+              <th>POS</th>
+              <th>Id</th>
+              <th>REF</th>
+              <th>ALLELE</th>
+              <th>Protein_position</th>
+              <th>Amino_acids</th>
+              <th>PDB</th>
+              <th>PDB_BEG</th>
+              <th>PDB_END</th>
+              <th>SIFT</th>
+              <th>SIFT_Description</th>
+              <th>PolyPhen</th>
+              <th>PolyPhen_Description</th>
+              <th>CHAIN</th>
+              <th>SP_Primary</th>
+              <th>RES_Length</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in result %}
+            <tr>
+              <td>{{ item.Chrom }}"</td>
+              <td>{{ item.POS }}</td>
+              <td>{{ item.Id }}</td>
+              <td>{{ item.REF }}</td>
+              <td>{{ item.ALLELE }}</td>
+              <td>{{ item.Protein_position }}</td>
+              <td>{{ item.Amino_acids }}</td>
+              <td>{{ item.PDB }}</td>
+              <td>{{ item.PDB_BEG }}</td>
+              <td>{{ item.PDB_END }}</td>
+              <td>{{ item.SIFT }}</td>
+              <td>{{ item.SIFT_Description }}</td>
+              <td>{{ item.PolyPhen }}</td>
+              <td>{{ item.PolyPhen_Description }}</td>
+              <td>{{ item.CHAIN }}</td>
+              <td>{{ item.SP_Primary }}</td>
+              <td>{{ item.RES_Length }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div><!-- /.container -->
+
+    <div id="viewerWrapper" class="container">
+              <div id="gl">
+              </div>
+    </div>
+
+    <script type='text/javascript'>
+    var gl = $('#gl')[0];
+              var pv_viewer = pv.Viewer(gl, {
+                width: 900,
+                height: 900,
+                background: 'white',
+                antialias: 'true'
+              });
+    </script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.2.2/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.0/js/dataTables.select.min.js"></script>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <script>
+    $(document).ready(function() {
+    var table = $('#table_result').DataTable( {
+      dom: 'Bfrtip',
+      select: {
+            style: 'single'
+        },
+        buttons: [
+            'colvis'
+        ]
+    } );
+
+    $('#table_result tbody').on( 'click', 'tr', function () {
+    var row = table.row( this ).data();
+    //alert(row);
+    } );
+
+    $('#table_result tbody').on( 'click', 'td', function () {
+    var cellIndex = table.cell( this ).index().columnVisible;
+    if(cellIndex == 7){
+    var cell = table.cell( this ).data();
+    //alert(cell);
+    var structure = null;
+    var pdb_id = cell;//"1r6a";
+    var bio_assembly = '1'; // 0: Asymmetric unit 1: Biological assembly
+        $.ajax('http://www.rcsb.org/pdb/files/'+pdb_id+'.pdb').done(function(data) {
+        structure = pv.io.pdb(data);
+        pv_viewer.cartoon('structure', structure, {showRelated: bio_assembly});
+        pv_viewer.autoZoom();
+        });
+      }
+    // note - call draw() to update the table's draw state with the new data
+    } );
+    //$('#table_result tbody').on( 'click', 'tr', function () {
+        //if ( $(this).hasClass('selected') ) {
+            //$(this).removeClass('selected');
+        //}
+        //else {
+            //table.$('tr.selected').removeClass('selected');
+            //$(this).addClass('selected');
+        //}
+    //} );
+    } );
+    </script>
+  </body>
+</html>
